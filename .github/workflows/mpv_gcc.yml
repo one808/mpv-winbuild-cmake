@@ -125,7 +125,7 @@ jobs:
           7z a -m0=lzma2 -mx=9 -ms=on release_$BIT/ffmpeg-${{ env.arch }}${{ env.x86_64_level }}-git-$hash.7z ./build_$BIT/install/mingw/bin/ffmpeg.exe
 
       - name: Collecting logs
-        if: always()
+        if: success()
         run: |
           mkdir -p build_${BIT}_logs
           cp -fr $(find build_$BIT -type f -iname "*-*.log" -or -wholename "*/ffbuild/config.log") build_${BIT}_logs || true
@@ -133,7 +133,7 @@ jobs:
 
       - name: Uploading logs
         uses: actions/upload-artifact@master
-        if: always()
+        if: success()
         with:
           name: mpv-${{ matrix.bit }}-logs
           path: logs.7z
@@ -146,18 +146,18 @@ jobs:
           path: release_${{ matrix.bit }}/mpv-${{ env.arch }}*
 
       - name: Cleaning build directory
-        if: always()
+        if: success()
         run: |
           rm -rf build_$BIT/mpv*
 
       - name: Cleaning rust toolchain directory
-        if: always()
+        if: success()
         run: |
           ninja -C build_$BIT cargo-clean
 
       - name: Saving ${{ matrix.bit }} toolchain cache
         uses: actions/cache/save@main
-        if: always()
+        if: success()
         with:
           path: build_${{ matrix.bit }}
           key: ${{ secrets.CACHE_VERSION }}-gcc-${{ matrix.bit }}_toolchain-${{ github.run_id }}
